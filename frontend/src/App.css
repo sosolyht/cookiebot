@@ -1,59 +1,152 @@
-#app {
+/* frontend\src\App.css */
+
+#App {
     height: 100vh;
     text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Nanum Gothic', sans-serif;
+    background-color: #2c3e50;
+    color: #ffffff;
+    position: relative;
 }
 
-#logo {
-    display: block;
-    width: 50%;
-    height: 50%;
-    margin: auto;
-    padding: 10% 0 0;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-origin: content-box;
+.status-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.result {
-    height: 20px;
-    line-height: 20px;
-    margin: 1.5rem auto;
+.status-message {
+    font-size: 14px;
+    font-weight: 300;
+    margin-right: 20px;
 }
 
-.input-box .btn {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    margin: 0 0 0 20px;
-    padding: 0 8px;
+.install-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px; /* 간격 추가 */
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: #444;
+    border-radius: 0; /* 라운드 제거 */
+    overflow: hidden;
+    margin-top: 10px;
+    height: 5px; /* 얇게 만들기 위해 높이를 줄임 */
+    box-shadow: none; /* 그림자 제거 */
+}
+
+.progress {
+    height: 100%;
+    background-color: #1abc9c;
+    width: 0;
+    transition: width 0.3s ease; /* 부드러운 전환 효과 */
+}
+
+.top-right-controls {
+    display: flex;
+    align-items: center;
+}
+
+.top-right-controls span {
+    margin: 0 10px;
+    font-size: 14px;
+}
+
+.top-right-controls .purchase-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: 2px solid #1abc9c;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #1abc9c;
     cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 14px;
 }
 
-.input-box .btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
+.top-right-controls .purchase-button:hover {
+    background-color: #1abc9c;
+    color: white;
 }
 
-.input-box .input {
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.controls button {
+    margin: 0 10px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 3px;
-    outline: none;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 10px;
-    background-color: rgba(240, 240, 240, 1);
-    -webkit-font-smoothing: antialiased;
+    border-radius: 5px;
+    background-color: #1abc9c;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px; /* 글꼴 크기 조정 */
 }
 
-.input-box .input:hover {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.controls button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
 }
 
-.input-box .input:focus {
+.controls button:not(:disabled):hover {
+    background-color: #16a085;
+}
+
+.vm-list {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 20px; /* 간격 추가 */
+}
+
+.vm-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    background-color: #34495e;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.vm-item span {
+    margin: 0 10px;
+    flex: 1;
+    text-align: center;
+    font-size: 14px; /* 글꼴 크기 조정 */
+}
+
+.vm-item .vm-name {
+    font-weight: 700; /* 가상머신 이름만 굵게 */
+}
+
+.vm-item .buttons {
+    display: flex;
+}
+
+.vm-item .buttons button {
+    margin: 0 5px;
+    padding: 5px 10px;
     border: none;
-    background-color: rgba(255, 255, 255, 1);
+    border-radius: 5px;
+    background-color: #1abc9c;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 12px; /* 글꼴 크기 조정 */
+}
+
+.vm-item .buttons button:hover {
+    background-color: #16a085;
 }
