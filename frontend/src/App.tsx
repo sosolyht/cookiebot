@@ -1,51 +1,61 @@
-// frontend/src/App.tsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AntiDetectStatus from './components/AntiDetectStatus';
-import AntiSidebar from './sidebar/AntiSidebar';
+import MainSidebar from './sidebar/MainSidebar';
+import VMSidebar from './sidebar/VMSidebar';
+import GmailAccountComponent from './pages/GmailAccount';
+import VM from './pages/VM';
+import { Sun, Moon } from 'lucide-react';
 
 function App() {
-    // 상태 관리
     const [isDarkMode, setIsDarkMode] = useState(true);
-    const [isAntiDetect, setIsAntiDetect] = useState(true); // 기본값을 true로 설정
+    const [isAntiDetect, setIsAntiDetect] = useState(true);
+    const [currentView, setCurrentView] = useState<'status' | 'gmail' | 'other'>('status');
     const [status, setStatus] = useState<string>("");
     const [statusColor, setStatusColor] = useState<string>("");
-    const [isInstalling, setIsInstalling] = useState<boolean>(false);
-    const [isInstalled, setIsInstalled] = useState<boolean>(false);
 
-    // 상태 변경 핸들러
-    const handleStatusChange = (newStatus: string, newColor: string, installed: boolean) => {
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [isDarkMode]);
+
+    const handleStatusChange = (newStatus: string, newColor: string) => {
         setStatus(newStatus);
         setStatusColor(newColor);
-        setIsInstalled(installed);
-        setIsInstalling(newStatus.includes("다운로드 중"));
     };
 
-    // AntiDetect 설치 핸들러
-    const handleInstallAntiDetect = async () => {
-        setIsInstalling(true);
-        try {
-            await window.go.antidetect.ADD.DownloadAndInstallAntiDetect();
-        } catch (error) {
-            console.error("설치 중 오류 발생:", error);
-        } finally {
-            setIsInstalling(false);
-        }
+    const toggleDarkMode = () => {
+        setIsDarkMode(prev => !prev);
     };
 
     return (
-        <div className={`min-h-screen flex ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'} transition-colors duration-300`}>
-            <AntiSidebar
+        <div className={`min-h-screen flex bg-light-bg dark:bg-dark-bg text-text-dark dark:text-text-light transition-colors duration-300`}>
+            <MainSidebar
                 isAntiDetect={isAntiDetect}
                 setIsAntiDetect={setIsAntiDetect}
                 status={status}
                 statusColor={statusColor}
-                isInstalling={isInstalling}
-                isInstalled={isInstalled}
-                handleInstallAntiDetect={handleInstallAntiDetect}
+                onMenuChange={setCurrentView}
+                currentView={currentView}
             />
-            <div className="flex-1 p-8">
-                {isAntiDetect && <AntiDetectStatus onStatusChange={handleStatusChange} />}
+            <div className="flex-1 p-8 relative">
+                <button
+                    onClick={toggleDarkMode}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-yellow-400 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-300"
+                >
+                    {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                </button>
+                {isAntiDetect ? (
+                    <>
+                        <AntiDetectStatus onStatusChange={handleStatusChange} />
+                        {currentView === 'gmail' && <GmailAccountComponent />}
+                        {currentView === 'other' && <div>Other Component</div>}
+                    </>
+                ) : (
+                    <VM />
+                )}
             </div>
         </div>
     );

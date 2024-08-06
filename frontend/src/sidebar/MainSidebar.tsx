@@ -1,7 +1,7 @@
 import React from 'react';
 import { Shield, Monitor, Mail, Menu } from 'lucide-react';
 
-interface AntiSidebarProps {
+interface MainSidebarProps {
     isAntiDetect: boolean;
     setIsAntiDetect: React.Dispatch<React.SetStateAction<boolean>>;
     status: string;
@@ -10,7 +10,7 @@ interface AntiSidebarProps {
     currentView: 'status' | 'gmail' | 'other';
 }
 
-const AntiSidebar: React.FC<AntiSidebarProps> = ({
+const MainSidebar: React.FC<MainSidebarProps> = ({
                                                      isAntiDetect,
                                                      setIsAntiDetect,
                                                      status,
@@ -41,31 +41,33 @@ const AntiSidebar: React.FC<AntiSidebarProps> = ({
             <div className={`text-sm ${statusColor} mb-4`}>
                 {status}
             </div>
-            <div className="space-y-2">
-                <button
-                    onClick={() => onMenuChange('status')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'status' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                >
-                    <Shield className="w-5 h-5 mr-2" />
-                    상태
-                </button>
-                <button
-                    onClick={() => onMenuChange('gmail')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'gmail' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                >
-                    <Mail className="w-5 h-5 mr-2" />
-                    Gmail 계정
-                </button>
-                <button
-                    onClick={() => onMenuChange('other')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'other' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                >
-                    <Menu className="w-5 h-5 mr-2" />
-                    기타
-                </button>
-            </div>
+            {isAntiDetect && (
+                <div className="space-y-2">
+                    <button
+                        onClick={() => onMenuChange('status')}
+                        className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'status' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                        <Shield className="w-5 h-5 mr-2" />
+                        상태
+                    </button>
+                    <button
+                        onClick={() => onMenuChange('gmail')}
+                        className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'gmail' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                        <Mail className="w-5 h-5 mr-2" />
+                        Gmail 계정
+                    </button>
+                    <button
+                        onClick={() => onMenuChange('other')}
+                        className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'other' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    >
+                        <Menu className="w-5 h-5 mr-2" />
+                        기타
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
 
-export default AntiSidebar;
+export default MainSidebar;

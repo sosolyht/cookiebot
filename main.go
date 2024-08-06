@@ -4,6 +4,7 @@ package main
 
 import (
 	antidetect "cookieBot/internal/anti"
+	"cookieBot/internal/db"
 	"cookieBot/internal/vm"
 	"cookieBot/utils"
 	"embed"
@@ -19,18 +20,23 @@ import (
 var assets embed.FS
 
 func main() {
-	// Zap 로거 초기화
 	logger, err := InitializeLogger()
 	if err != nil {
 		fmt.Printf("Failed to initialize logger: %v\n", err)
 		return
 	}
-	defer logger.Sync() // 버퍼에 남은 로그를 플러시
+	defer logger.Sync()
 
-	// Create an instance of the app structure
 	vmMain := vm.VMMain(logger)
 	vmDownload := vm.VMDownload(logger)
 	antiDownload := antidetect.AntiDetectDownload(logger)
+
+	// EmailDB 초기화
+	emailDB, err := db.NewEmailDB("config.json")
+	if err != nil {
+		logger.Error("Failed to initialize EmailDB", zap.Error(err))
+		return
+	}
 
 	// 유틸리티 함수 실행
 	err = utils.AddComments()
@@ -40,7 +46,7 @@ func main() {
 
 	// Create application with options
 	err = wails.Run(&options.App{
-		Title:  "My Wails Application", // 타이틀바에 제목을 설정합니다
+		Title:  "밀림의제왕",
 		Width:  1024,
 		Height: 768,
 		AssetServer: &assetserver.Options{
@@ -55,6 +61,7 @@ func main() {
 			vmMain,
 			vmDownload,
 			antiDownload,
+			emailDB,
 		},
 	})
 

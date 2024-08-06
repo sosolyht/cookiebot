@@ -1,4 +1,3 @@
-// global.d.ts
 interface Runtime {
     LogInfo(message: string): void;
     LogError(message: string): void;
@@ -25,6 +24,21 @@ interface Window {
                 IsAntiDetectInstalled(): Promise<boolean>;
                 RunAntiDetect(): Promise<void>;
             }
+        },
+        db: {
+            EmailDB: {
+                DeleteEmail(arg1: string): Promise<void>;
+                GetEmail(arg1: string): Promise<GmailAccount>;
+                ListEmails(): Promise<Array<GmailAccount>>;
+                SaveEmail(arg1: GmailAccount): Promise<void>;
+            }
         }
     }
+}
+
+interface GmailAccount {
+    Email: string;
+    Password: string;
+    RecoveryEmail: string;
+    Used: boolean;
 }
