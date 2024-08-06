@@ -1,3 +1,5 @@
+// frontend\src\sidebar\MainSidebar.tsx
+
 import React from 'react';
 import { Shield, Monitor, Mail, Menu } from 'lucide-react';
 

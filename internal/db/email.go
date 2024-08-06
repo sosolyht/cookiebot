@@ -126,3 +126,13 @@ func (db *EmailDB) DeleteEmail(email string) error {
 
 	return err
 }
+
+func (db *EmailDB) BulkInsertEmails(accounts []GmailAccount) error {
+	for _, account := range accounts {
+		err := db.SaveEmail(account)
+		if err != nil {
+			return fmt.Errorf("failed to insert email %s: %w", account.Email, err)
+		}
+	}
+	return nil
+}
