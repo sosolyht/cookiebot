@@ -1,3 +1,5 @@
+// frontend\src\App.tsx
+
 import React, { useState, useEffect } from 'react';
 import AntiDetectStatus from './components/AntiDetectStatus';
 import MainSidebar from './sidebar/MainSidebar';

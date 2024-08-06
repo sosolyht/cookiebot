@@ -19,53 +19,47 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                                                      currentView
                                                  }) => {
     return (
-        <div className="w-64 bg-gray-100 dark:bg-gray-800 p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-                <button
-                    onClick={() => setIsAntiDetect(prev => !prev)}
-                    className={`flex items-center justify-center w-16 h-8 rounded-full bg-gray-200 dark:bg-gray-600 transition-all duration-300 ${
-                        isAntiDetect ? 'bg-blue-500' : ''
-                    }`}
-                >
-                    <div className={`absolute w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${
-                        isAntiDetect ? 'translate-x-4' : '-translate-x-4'
-                    }`} />
-                    <Shield className={`w-4 h-4 absolute left-2 transition-opacity duration-300 ${
-                        isAntiDetect ? 'text-white opacity-100' : 'opacity-0'
-                    }`} />
-                    <Monitor className={`w-4 h-4 absolute right-2 transition-opacity duration-300 ${
-                        !isAntiDetect ? 'text-gray-600 opacity-100' : 'opacity-0'
-                    }`} />
-                </button>
+        <div className="w-64 bg-gray-100 dark:bg-gray-800 p-4 flex flex-col items-center">
+            <div className="relative w-16 h-8 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-1 cursor-pointer"
+                 onClick={() => setIsAntiDetect(prev => !prev)}>
+                <div className={`absolute w-6 h-6 rounded-full transition-transform duration-300 flex items-center justify-center ${
+                    isAntiDetect
+                        ? 'bg-blue-500 transform translate-x-0'
+                        : 'bg-gray-500 transform translate-x-8'
+                }`}>
+                    {isAntiDetect ? (
+                        <Shield className="w-4 h-4 text-white" />
+                    ) : (
+                        <Monitor className="w-4 h-4 text-white" />
+                    )}
+                </div>
             </div>
-            <div className={`text-sm ${statusColor} mb-4`}>
+            <div className={`text-sm ${statusColor} my-4 text-center`}>
                 {status}
             </div>
-            {isAntiDetect && (
-                <div className="space-y-2">
-                    <button
-                        onClick={() => onMenuChange('status')}
-                        className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'status' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                    >
-                        <Shield className="w-5 h-5 mr-2" />
-                        상태
-                    </button>
-                    <button
-                        onClick={() => onMenuChange('gmail')}
-                        className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'gmail' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                    >
-                        <Mail className="w-5 h-5 mr-2" />
-                        Gmail 계정
-                    </button>
-                    <button
-                        onClick={() => onMenuChange('other')}
-                        className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'other' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                    >
-                        <Menu className="w-5 h-5 mr-2" />
-                        기타
-                    </button>
-                </div>
-            )}
+            <div className="space-y-2 w-full">
+                <button
+                    onClick={() => onMenuChange('status')}
+                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'status' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                >
+                    <Shield className="w-5 h-5 mr-2" />
+                    상태
+                </button>
+                <button
+                    onClick={() => onMenuChange('gmail')}
+                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'gmail' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                >
+                    <Mail className="w-5 h-5 mr-2" />
+                    Gmail 계정
+                </button>
+                <button
+                    onClick={() => onMenuChange('other')}
+                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'other' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                >
+                    <Menu className="w-5 h-5 mr-2" />
+                    기타
+                </button>
+            </div>
         </div>
     );
 };
