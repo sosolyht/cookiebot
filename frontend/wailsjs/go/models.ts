@@ -1,4 +1,4 @@
-export namespace main {
+export namespace vm {
 	
 	export class VMWareStatus {
 	    vmrun_exists: boolean;

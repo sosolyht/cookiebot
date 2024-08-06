@@ -1,6 +1,6 @@
-// app.go
+// internal\vm\vmDownload.go
 
-package main
+package vm
 
 import (
 	"archive/tar"
@@ -18,73 +18,42 @@ import (
 	"syscall"
 )
 
-type App struct {
+type VMD struct {
 	ctx      context.Context
 	logger   *zap.Logger
 	progress int
 	mu       sync.Mutex
 }
 
-type VMWareStatus struct {
-	VmrunExists    bool `json:"vmrun_exists"`
-	VmwareExists   bool `json:"vmware_exists"`
-	VmFolderExists bool `json:"vm_folder_exists"`
+func VMDownload(logger *zap.Logger) *VMD {
+	return &VMD{logger: logger}
 }
 
-func NewApp(logger *zap.Logger) *App {
-	return &App{logger: logger}
-}
-
-func (a *App) CheckVMWareStatus() VMWareStatus {
-	vmrunPath := "C:\\Program Files (x86)\\VMware\\VMware Workstation\\vmrun.exe"
-	vmwarePath := "C:\\Program Files (x86)\\VMware\\VMware Workstation\\vmware.exe"
-	vmFolder := filepath.Join(os.Getenv("USERPROFILE"), "Documents", "Virtual Machines")
-
-	_, vmrunErr := os.Stat(vmrunPath)
-	_, vmwareErr := os.Stat(vmwarePath)
-	_, vmFolderErr := os.Stat(vmFolder)
-
-	vmrunExists := !os.IsNotExist(vmrunErr)
-	vmwareExists := !os.IsNotExist(vmwareErr)
-	vmFolderExists := !os.IsNotExist(vmFolderErr)
-
-	a.logger.Info("VMWare paths checked",
-		zap.Bool("vmrun_exists", vmrunExists),
-		zap.Bool("vmware_exists", vmwareExists),
-		zap.Bool("vm_folder_exists", vmFolderExists))
-
-	return VMWareStatus{
-		VmrunExists:    vmrunExists,
-		VmwareExists:   vmwareExists,
-		VmFolderExists: vmFolderExists,
-	}
-}
-
-func (a *App) DownloadAndInstallVMWare() error {
+func (v *VMD) DownloadAndInstallVMWare() error {
 	url := "https://softwareupdate.vmware.com/cds/vmw-desktop/ws/17.5.2/23775571/windows/core/VMware-workstation-17.5.2-23775571.exe.tar"
 	filePath := filepath.Join(os.TempDir(), "VMware-workstation-17.5.2-23775571.exe.tar")
 
-	a.logger.Info("Starting VMWare download", zap.String("url", url))
+	v.logger.Info("Starting VMWare download", zap.String("url", url))
 
 	// 다운로드
-	err := a.downloadFile(filePath, url)
+	err := v.downloadFile(filePath, url)
 	if err != nil {
-		a.logger.Error("Failed to download VMWare", zap.Error(err))
+		v.logger.Error("Failed to download VMWare", zap.Error(err))
 		return err
 	}
 
 	// 압축 해제 및 설치
-	err = a.extractAndInstallVMWare(filePath)
+	err = v.extractAndInstallVMWare(filePath)
 	if err != nil {
-		a.logger.Error("Failed to install VMWare", zap.Error(err))
+		v.logger.Error("Failed to install VMWare", zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("VMWare download and installation completed successfully")
+	v.logger.Info("VMWare download and installation completed successfully")
 	return nil
 }
 
-func (a *App) downloadFile(filePath string, url string) error {
+func (v *VMD) downloadFile(filePath string, url string) error {
 	out, err := os.Create(filePath)
 	if err != nil {
 		return err
@@ -105,7 +74,7 @@ func (a *App) downloadFile(filePath string, url string) error {
 		if n > 0 {
 			out.Write(buf[:n])
 			downloadedSize += int64(n)
-			a.updateProgress(downloadedSize, totalSize)
+			v.updateProgress(downloadedSize, totalSize)
 		}
 		if err != nil {
 			if err == io.EOF {
@@ -118,8 +87,8 @@ func (a *App) downloadFile(filePath string, url string) error {
 	return nil
 }
 
-func (a *App) extractAndInstallVMWare(tarPath string) error {
-	a.logger.Info("Starting to extract VMWare tar file", zap.String("tarPath", tarPath))
+func (v *VMD) extractAndInstallVMWare(tarPath string) error {
+	v.logger.Info("Starting to extract VMWare tar file", zap.String("tarPath", tarPath))
 
 	file, err := os.Open(tarPath)
 	if err != nil {
@@ -132,16 +101,16 @@ func (a *App) extractAndInstallVMWare(tarPath string) error {
 	if err != nil {
 		// gzip 압축 해제에 실패했다면 파일 포인터를 처음으로 되돌리고
 		// 일반 tar 파일로 처리 시도
-		a.logger.Warn("Failed to open as gzip, trying as regular tar", zap.Error(err))
+		v.logger.Warn("Failed to open as gzip, trying as regular tar", zap.Error(err))
 		file.Seek(0, 0)
-		return a.extractTar(file)
+		return v.extractTar(file)
 	}
 	defer gzipReader.Close()
 
-	return a.extractTar(gzipReader)
+	return v.extractTar(gzipReader)
 }
 
-func (a *App) extractTar(reader io.Reader) error {
+func (v *VMD) extractTar(reader io.Reader) error {
 	tarReader := tar.NewReader(reader)
 
 	extractedPath := filepath.Join(os.TempDir(), "vmware_extracted")
@@ -180,19 +149,19 @@ func (a *App) extractTar(reader io.Reader) error {
 		}
 	}
 
-	a.logger.Info("Extraction completed, searching for installation file")
+	v.logger.Info("Extraction completed, searching for installation file")
 
 	// 압축 해제된 파일에서 .exe 파일 찾기
-	exePath, err := a.findInstallationFile(extractedPath)
+	exePath, err := v.findInstallationFile(extractedPath)
 	if err != nil {
-		a.logger.Error("Failed to find installation file", zap.Error(err))
+		v.logger.Error("Failed to find installation file", zap.Error(err))
 		return err
 	}
 
-	return a.installVMWare(exePath)
+	return v.installVMWare(exePath)
 }
 
-func (a *App) findInstallationFile(dir string) (string, error) {
+func (v *VMD) findInstallationFile(dir string) (string, error) {
 	var exePath string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -213,27 +182,27 @@ func (a *App) findInstallationFile(dir string) (string, error) {
 		return "", fmt.Errorf("no .exe file found in %s", dir)
 	}
 
-	a.logger.Info("Installation file found", zap.String("path", exePath))
+	v.logger.Info("Installation file found", zap.String("path", exePath))
 	return exePath, nil
 }
 
-func (a *App) installVMWare(filepath string) error {
-	a.logger.Info("Starting VMWare installation", zap.String("filepath", filepath))
+func (v *VMD) installVMWare(filepath string) error {
+	v.logger.Info("Starting VMWare installation", zap.String("filepath", filepath))
 
 	// 파일 존재 여부 확인
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		a.logger.Error("Installation file does not exist", zap.String("filepath", filepath))
+		v.logger.Error("Installation file does not exist", zap.String("filepath", filepath))
 		return fmt.Errorf("installation file not found: %s", filepath)
 	}
 
 	// RunAs 함수를 사용하여 관리자 권한으로 실행
 	err := RunAs(filepath)
 	if err != nil {
-		a.logger.Error("Error starting VMWare installation with admin privileges", zap.Error(err))
+		v.logger.Error("Error starting VMWare installation with admin privileges", zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("VMWare installation process started with admin privileges")
+	v.logger.Info("VMWare installation process started with admin privileges")
 	return nil
 }
 
@@ -253,14 +222,14 @@ func RunAs(path string) error {
 	return nil
 }
 
-func (a *App) updateProgress(downloadedSize int64, totalSize int64) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.progress = int(float64(downloadedSize) / float64(totalSize) * 100)
+func (v *VMD) updateProgress(downloadedSize int64, totalSize int64) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	v.progress = int(float64(downloadedSize) / float64(totalSize) * 100)
 }
 
-func (a *App) GetInstallationProgress() int {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	return a.progress
+func (v *VMD) GetInstallationProgress() int {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	return v.progress
 }

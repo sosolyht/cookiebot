@@ -3,6 +3,8 @@
 package main
 
 import (
+	antidetect "cookieBot/internal/anti"
+	"cookieBot/internal/vm"
 	"cookieBot/utils"
 	"embed"
 	"fmt"
@@ -26,7 +28,9 @@ func main() {
 	defer logger.Sync() // 버퍼에 남은 로그를 플러시
 
 	// Create an instance of the app structure
-	app := NewApp(logger)
+	vmMain := vm.VMMain(logger)
+	vmDownload := vm.VMDownload(logger)
+	antiDownload := antidetect.AntiDetectDownload(logger)
 
 	// 유틸리티 함수 실행
 	err = utils.AddComments()
@@ -48,7 +52,9 @@ func main() {
 			Theme:        windows.Dark,
 		},
 		Bind: []interface{}{
-			app, // app을 바인딩
+			vmMain,
+			vmDownload,
+			antiDownload,
 		},
 	})
 
