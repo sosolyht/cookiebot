@@ -4,7 +4,10 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "lodash": "^4.17.21",
-    "react-modal": "^3.16.1"
+    "lucide-react": "^0.424.0",
+    "react-icons": "^5.2.1",
+    "react-modal": "^3.16.1",
+    "react-switch": "^7.0.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

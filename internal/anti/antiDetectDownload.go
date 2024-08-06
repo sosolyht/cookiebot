@@ -33,23 +33,23 @@ func (a *ADD) DownloadAndInstallAntiDetect() error {
 	url := "https://data.hidemyacc.com/HideMyAcc-3-Setup-072024.zip?_gl=1*1uh501u*_gcl_au*MTUxMDE0NjMxMi4xNzIyODI5NTg0*_ga*MTY2Mjg1MzA3LjE3MjI4Mjk1ODQ.*_ga_N9X6D2Y20T*MTcyMjg4OTk5OS4yLjEuMTcyMjg5MTY3MC40OC4wLjA."
 	filePath := filepath.Join(os.TempDir(), "HideMyAcc-3-Setup-072024.zip")
 
-	a.logger.Info("Starting AntiDetect download", zap.String("url", url), zap.String("filePath", filePath))
+	a.logger.Info("Starting A download", zap.String("url", url), zap.String("filePath", filePath))
 
 	// 다운로드
 	err := a.downloadFile(filePath, url)
 	if err != nil {
-		a.logger.Error("Failed to download AntiDetect", zap.Error(err))
+		a.logger.Error("Failed to download A", zap.Error(err))
 		return err
 	}
 
 	// 압축 해제 및 설치
 	err = a.extractAndInstallAntiDetect(filePath)
 	if err != nil {
-		a.logger.Error("Failed to install AntiDetect", zap.Error(err))
+		a.logger.Error("Failed to install A", zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("AntiDetect download and installation completed successfully")
+	a.logger.Info("A download and installation completed successfully")
 	return nil
 }
 
@@ -92,7 +92,7 @@ func (a *ADD) downloadFile(filePath string, url string) error {
 }
 
 func (a *ADD) extractAndInstallAntiDetect(zipPath string) error {
-	a.logger.Info("Starting to extract AntiDetect zip file", zap.String("zipPath", zipPath))
+	a.logger.Info("Starting to extract A zip file", zap.String("zipPath", zipPath))
 
 	zipReader, err := zip.OpenReader(zipPath)
 	if err != nil {
@@ -187,7 +187,7 @@ func (a *ADD) findInstallationFile(dir string) (string, error) {
 }
 
 func (a *ADD) installAntiDetect(filepath string) error {
-	a.logger.Info("Starting AntiDetect installation", zap.String("filepath", filepath))
+	a.logger.Info("Starting A installation", zap.String("filepath", filepath))
 
 	// 파일 존재 여부 확인
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
@@ -198,11 +198,11 @@ func (a *ADD) installAntiDetect(filepath string) error {
 	// RunAs 함수를 사용하여 관리자 권한으로 실행
 	err := RunAs(filepath)
 	if err != nil {
-		a.logger.Error("Error starting AntiDetect installation with admin privileges", zap.Error(err))
+		a.logger.Error("Error starting A installation with admin privileges", zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("AntiDetect installation process started with admin privileges")
+	a.logger.Info("A installation process started with admin privileges")
 	return nil
 }
 
@@ -236,16 +236,20 @@ func (a *ADD) GetInstallationProgress() int {
 }
 
 func (a *ADD) IsAntiDetectInstalled() (bool, error) {
-	installPath := `C:\Users\heetaek\AppData\Local\Programs\hidemyacc-3\HideMyAcc-3.exe`
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		a.logger.Fatal("Failed to get user home directory", zap.Error(err))
+	}
+	installPath := filepath.Join(homeDir, "AppData", "Local", "Programs", "hidemyacc-3", "HideMyAcc-3.exe")
 	if exists, err := pathExists(installPath); err != nil {
-		a.logger.Error("Failed to check AntiDetect installation path", zap.Error(err))
+		a.logger.Error("Failed to check A installation path", zap.Error(err))
 		return false, err
 	} else if !exists {
-		a.logger.Info("AntiDetect is not installed")
+		a.logger.Info("A is not installed")
 		return false, nil
 	}
 
-	a.logger.Info("AntiDetect is installed", zap.String("path", installPath))
+	a.logger.Info("A is installed", zap.String("path", installPath))
 	return true, nil
 }
 
@@ -273,17 +277,17 @@ func (a *ADD) RunAntiDetect() error {
 
 	// 파일 존재 여부 확인
 	if _, err := os.Stat(exePath); os.IsNotExist(err) {
-		a.logger.Error("AntiDetect executable not found", zap.String("path", exePath))
-		return fmt.Errorf("AntiDetect executable not found: %s", exePath)
+		a.logger.Error("A executable not found", zap.String("path", exePath))
+		return fmt.Errorf("A executable not found: %s", exePath)
 	}
 
 	cmd := exec.Command(exePath)
 	if err := cmd.Start(); err != nil {
-		a.logger.Error("Failed to start AntiDetect", zap.String("path", exePath), zap.Error(err))
+		a.logger.Error("Failed to start A", zap.String("path", exePath), zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("AntiDetect started successfully", zap.String("path", exePath))
+	a.logger.Info("A started successfully", zap.String("path", exePath))
 	return nil
 }
 
@@ -295,12 +299,12 @@ func (a *ADD) EnsureAntiDetectRunning() error {
 
 	if isInstalled {
 		if !isProcessRunning("HideMyAcc-3.exe") {
-			a.logger.Info("AntiDetect is not running, attempting to start")
+			a.logger.Info("A is not running, attempting to start")
 			return a.RunAntiDetect()
 		}
-		a.logger.Info("AntiDetect is already running")
+		a.logger.Info("A is already running")
 	} else {
-		a.logger.Error("AntiDetect is not installed")
+		a.logger.Error("A is not installed")
 	}
 
 	return nil
@@ -328,16 +332,16 @@ func (a *ADD) CheckAndRunAntiDetect() error {
 
 	// 파일이 존재하는지 확인합니다.
 	if _, err := os.Stat(exePath); os.IsNotExist(err) {
-		a.logger.Error("AntiDetect executable not found", zap.String("path", exePath))
-		return fmt.Errorf("AntiDetect executable not found: %s", exePath)
+		a.logger.Error("A executable not found", zap.String("path", exePath))
+		return fmt.Errorf("A executable not found: %s", exePath)
 	}
 
 	// 프로세스가 실행 중인지 확인합니다.
 	if !isProcessRunning("HideMyAcc-3.exe") {
-		a.logger.Info("AntiDetect is not running, attempting to start", zap.String("path", exePath))
+		a.logger.Info("A is not running, attempting to start", zap.String("path", exePath))
 		return a.RunAntiDetect()
 	}
 
-	a.logger.Info("AntiDetect is already running")
+	a.logger.Info("A is already running")
 	return nil
 }
