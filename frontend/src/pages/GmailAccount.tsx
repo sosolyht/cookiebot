@@ -21,7 +21,7 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; children: React.Re
     );
 };
 
-const GmailAccountComponent: React.FC = () => {
+const GmailAccount: React.FC = () => {
     const [emailAccounts, setEmailAccounts] = useState<GmailAccount[]>([]);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
@@ -190,4 +190,4 @@ const GmailAccountComponent: React.FC = () => {
     );
 };
 
-export default GmailAccountComponent;
+export default GmailAccount;

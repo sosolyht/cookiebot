@@ -4,14 +4,15 @@ import React, { useState, useEffect } from 'react';
 import AntiDetectStatus from './components/AntiDetectStatus';
 import MainSidebar from './sidebar/MainSidebar';
 import VMSidebar from './sidebar/VMSidebar';
-import GmailAccountComponent from './pages/GmailAccount';
+import GmailAccount from './pages/GmailAccount';
+import AmazonProfile from "./pages/AmazonProfile";
 import VM from './pages/VM';
 import { Sun, Moon } from 'lucide-react';
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [isAntiDetect, setIsAntiDetect] = useState(true);
-    const [currentView, setCurrentView] = useState<'status' | 'gmail' | 'other'>('status');
+    const [currentView, setCurrentView] = useState<'status' | 'gmail' | 'amazon' | 'other'>('status');
     const [status, setStatus] = useState<string>("");
     const [statusColor, setStatusColor] = useState<string>("");
 
@@ -52,7 +53,8 @@ function App() {
                 {isAntiDetect ? (
                     <>
                         <AntiDetectStatus onStatusChange={handleStatusChange} />
-                        {currentView === 'gmail' && <GmailAccountComponent />}
+                        {currentView === 'gmail' && <GmailAccount />}
+                        {currentView === 'amazon' && <AmazonProfile />}
                         {currentView === 'other' && <div>Other Component</div>}
                     </>
                 ) : (

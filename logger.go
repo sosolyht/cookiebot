@@ -6,12 +6,16 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"path/filepath"
 )
 
-// InitializeLogger initializes and returns a Zap logger with colorized console output.
+// InitializeLogger initializes and returns a Zap logger with colorized console output and file output.
 func InitializeLogger() (*zap.Logger, error) {
 	// 콘솔 출력용 인코더 설정
 	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig())
+
+	// 파일 출력용 인코더 설정
+	fileEncoder := zapcore.NewJSONEncoder(encoderConfig())
 
 	// 로그 레벨 설정
 	atomicLevel := zap.NewAtomicLevel()
@@ -20,8 +24,26 @@ func InitializeLogger() (*zap.Logger, error) {
 	// 콘솔 출력 설정
 	consoleOutput := zapcore.Lock(os.Stdout)
 
-	// 코어 설정
-	core := zapcore.NewCore(consoleEncoder, consoleOutput, atomicLevel)
+	// 실행 파일의 디렉토리 경로 가져오기
+	executablePath, err := os.Executable()
+	if err != nil {
+		return nil, err
+	}
+	executableDir := filepath.Dir(executablePath)
+
+	// 로그 파일 경로 설정
+	logFilePath := filepath.Join(executableDir, "app.log")
+	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		return nil, err
+	}
+	fileOutput := zapcore.AddSync(logFile)
+
+	// 코어 설정 (콘솔 + 파일)
+	core := zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, consoleOutput, atomicLevel),
+		zapcore.NewCore(fileEncoder, fileOutput, atomicLevel),
+	)
 
 	// 로거 생성
 	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))

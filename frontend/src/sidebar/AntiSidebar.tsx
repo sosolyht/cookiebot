@@ -1,15 +1,15 @@
 // frontend\src\sidebar\AntiSidebar.tsx
 
 import React from 'react';
-import { Shield, Monitor, Mail, Menu } from 'lucide-react';
+import { Shield, Monitor, Mail, Menu, ShoppingCart } from 'lucide-react';
 
 interface AntiSidebarProps {
     isAntiDetect: boolean;
     setIsAntiDetect: React.Dispatch<React.SetStateAction<boolean>>;
     status: string;
     statusColor: string;
-    onMenuChange: (view: 'status' | 'gmail' | 'other') => void;
-    currentView: 'status' | 'gmail' | 'other';
+    onMenuChange: (view: 'status' | 'gmail' | 'amazon' | 'other') => void;
+    currentView: 'status' | 'gmail' | 'amazon' | 'other';
 }
 
 const AntiSidebar: React.FC<AntiSidebarProps> = ({
@@ -57,6 +57,13 @@ const AntiSidebar: React.FC<AntiSidebarProps> = ({
                 >
                     <Mail className="w-5 h-5 mr-2" />
                     Gmail 계정
+                </button>
+                <button
+                    onClick={() => onMenuChange('amazon')}
+                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'amazon' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Amazon 프로필
                 </button>
                 <button
                     onClick={() => onMenuChange('other')}
