@@ -6,6 +6,10 @@ export function AddProfile(arg1) {
   return window['go']['browser']['BrowserManager']['AddProfile'](arg1);
 }
 
+export function FetchProfileInfo(arg1) {
+  return window['go']['browser']['BrowserManager']['FetchProfileInfo'](arg1);
+}
+
 export function FetchProfiles() {
   return window['go']['browser']['BrowserManager']['FetchProfiles']();
 }

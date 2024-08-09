@@ -1,7 +1,7 @@
 // frontend/src/components/IPInfo.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Flag } from 'lucide-react'; // 국가 아이콘 추가
+import ReactCountryFlag from 'react-country-flag'; // 국기 아이콘 추가
 
 interface IPInfo {
     country: string;
@@ -46,13 +46,22 @@ const IPInfo: React.FC<IPInfoProps> = ({ ip }) => {
     }
 
     if (error) {
-        return <div className="text-red-500">{error}</div>;
+        return <div className="ip-info-error">{error}</div>; // 오류 메시지 스타일 적용
     }
 
     return (
-        <div className="flex items-center">
-            <Flag className="h-4 w-4 mr-1" />
-            <span>{info?.country} - {info?.region}</span>
+        <div className="ip-info-container"> {/* 전체 컨테이너 스타일 적용 */}
+            {info?.country ? (
+                <ReactCountryFlag
+                    countryCode={info.country}
+                    svg
+                    className="ip-info-flag" // 국기 아이콘 스타일 적용
+                    title={info.country}
+                />
+            ) : (
+                <div className="h-8 w-8" /> // 빈 공간을 유지하기 위해 대체 요소 추가
+            )}
+            <span className="ip-info-text">{info?.country || 'N/A'} - {info?.region || 'N/A'}</span> {/* 텍스트 스타일 적용 */}
         </div>
     );
 };

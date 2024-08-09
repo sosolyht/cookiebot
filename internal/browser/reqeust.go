@@ -41,6 +41,17 @@ type Profile struct {
 	CloudID       string   `json:"cloud_id"`
 	CreationDate  int64    `json:"creation_date"`
 	ModifyDate    int64    `json:"modify_date"`
+	ConfigID      string   `json:"configid"`  // 추가된 필드
+	Type          string   `json:"type"`      // 추가된 필드
+	Proxy         string   `json:"proxy"`     // 추가된 필드
+	Notes         string   `json:"notes"`     // 추가된 필드
+	UserAgent     string   `json:"useragent"` // 추가된 필드
+	Browser       string   `json:"browser"`   // 추가된 필드
+	OS            string   `json:"os"`        // 추가된 필드
+	Screen        string   `json:"screen"`    // 추가된 필드
+	Language      string   `json:"language"`  // 추가된 필드
+	CPU           int      `json:"cpu"`       // 추가된 필드
+	Memory        int      `json:"memory"`    // 추가된 필드
 }
 
 // ProfileResponse 구조체 정의
@@ -48,6 +59,13 @@ type ProfileResponse struct {
 	Code   int                `json:"code"`
 	Status string             `json:"status"`
 	Data   map[string]Profile `json:"data"`
+}
+
+// ProfileInfoResponse 구조체 정의 (프로필 정보 요청에 대한 응답)
+type ProfileInfoResponse struct {
+	Code   int     `json:"code"`
+	Status string  `json:"status"`
+	Data   Profile `json:"data"` // 수정된 Profile 구조체 사용
 }
 
 // Cookie 구조체 정의
@@ -102,6 +120,25 @@ func (bm *BrowserManager) FetchProfiles() (*ProfileResponse, error) {
 	}
 	bm.logger.Info("Successfully fetched profiles", zap.Int("count", len(profileResponse.Data)))
 	return &profileResponse, nil
+}
+
+// FetchProfileInfo 메서드 정의 (프로필 정보 요청)
+func (bm *BrowserManager) FetchProfileInfo(profileID string) (*ProfileInfoResponse, error) {
+	bm.logger.Info("Fetching profile info", zap.String("profileID", profileID))
+	resp, err := http.Get(fmt.Sprintf("%s/profile/getinfo/%s", BASE_URL, profileID))
+	if err != nil {
+		bm.logger.Error("Failed to fetch profile info", zap.String("profileID", profileID), zap.Error(err))
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var profileInfoResponse ProfileInfoResponse
+	if err := json.NewDecoder(resp.Body).Decode(&profileInfoResponse); err != nil {
+		bm.logger.Error("Failed to decode profile info response", zap.Error(err))
+		return nil, err
+	}
+	bm.logger.Info("Successfully fetched profile info", zap.String("profileID", profileID))
+	return &profileInfoResponse, nil
 }
 
 // AddProfile 메서드 정의

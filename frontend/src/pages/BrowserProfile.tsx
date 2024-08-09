@@ -10,8 +10,8 @@ interface Profile {
     name: string;
     status: string;
     creation_date: number;
-    ip: string;
-    proxy?: string;
+    ip: string; // 기본 IP 정보
+    proxy?: string; // 프록시 정보
     notes?: string;
     folder?: string;
     tags?: string[];
@@ -43,13 +43,53 @@ const BrowserProfile: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
+            // 1단계: 프로필 목록을 가져옵니다.
             const response = await window.go.browser.BrowserManager.FetchProfiles() as unknown as ApiResponse;
+
             if (response && response.status === "success" && response.data) {
-                const profilesArray: Profile[] = Object.values(response.data).map((profile) => ({
-                    ...profile,
-                    creation_date: profile.creation_date * 1000,
-                }));
-                setProfiles(profilesArray);
+                const profilesArray = await Promise.all(
+                    Object.keys(response.data).map(async (profileId) => {
+                        const profileInfoResponse = await window.go.browser.BrowserManager.FetchProfileInfo(profileId) as unknown as ProfileInfoResponse;
+
+                        if (profileInfoResponse && profileInfoResponse.status === "success" && profileInfoResponse.data) {
+                            const profileInfo = profileInfoResponse.data;
+
+                            // 프록시가 있을 경우 IP를 설정
+                            const ip = profileInfo.proxy ? await getProxyIP(profileInfo.proxy) : '';
+
+                            // 2단계: 프로필 정보를 반환합니다.
+                            return {
+                                id: profileId,
+                                name: profileInfo.name,
+                                status: profileInfo.status,
+                                creation_date: profileInfo.creation_date ? profileInfo.creation_date * 1000 : 0, // 기본값 설정
+                                ip: ip, // 프록시에서 가져온 IP
+                                proxy: profileInfo.proxy,
+                                folder: profileInfo.folder,
+                                tags: profileInfo.tags,
+                                notes: profileInfo.notes,
+                                useragent: profileInfo.useragent,
+                                browser: profileInfo.browser,
+                                os: profileInfo.os,
+                                screen: profileInfo.screen,
+                                language: profileInfo.language,
+                                cpu: profileInfo.cpu,
+                                memory: profileInfo.memory,
+                                debug_port: profileInfo.debug_port, // Profile에 맞추어 추가
+                                websocket_link: profileInfo.websocket_link, // Profile에 맞추어 추가
+                                cloud_id: profileInfo.cloud_id, // Profile에 맞추어 추가
+                                modify_date: profileInfo.modify_date // Profile에 맞추어 추가
+                            } as Profile; // 타입 단언
+                        } else {
+                            setError("Failed to fetch profile info for ID: " + profileId);
+                            return null; // 프로필 정보를 가져오지 못한 경우 null을 반환
+                        }
+                    })
+                );
+
+                // null 값을 필터링하여 Profile[] 타입으로 설정
+                const filteredProfilesArray: Profile[] = profilesArray.filter((profile): profile is Profile => profile !== null);
+                setProfiles(filteredProfilesArray);
             } else {
                 setError("Unexpected response format: " + JSON.stringify(response));
             }
@@ -59,6 +99,17 @@ const BrowserProfile: React.FC = () => {
             setLoading(false);
         }
     };
+
+
+
+    // 프록시 IP를 가져오는 함수
+    const getProxyIP = async (proxy: string): Promise<string> => {
+        const proxyParts = proxy.split(':');
+        // 프록시 IP를 가져옵니다. 예: socks5://123.45.67.89:1080 -> 123.45.67.89
+        const ip = proxyParts[1].replace('socks5://', '').replace('http://', '');
+        return ip;
+    };
+
 
     const handleProfileSettingsOpen = (profile: Profile) => {
         setSelectedProfile(profile);

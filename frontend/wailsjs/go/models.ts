@@ -104,6 +104,17 @@ export namespace browser {
 	    cloud_id: string;
 	    creation_date: number;
 	    modify_date: number;
+	    configid: string;
+	    type: string;
+	    proxy: string;
+	    notes: string;
+	    useragent: string;
+	    browser: string;
+	    os: string;
+	    screen: string;
+	    language: string;
+	    cpu: number;
+	    memory: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Profile(source);
@@ -120,7 +131,52 @@ export namespace browser {
 	        this.cloud_id = source["cloud_id"];
 	        this.creation_date = source["creation_date"];
 	        this.modify_date = source["modify_date"];
+	        this.configid = source["configid"];
+	        this.type = source["type"];
+	        this.proxy = source["proxy"];
+	        this.notes = source["notes"];
+	        this.useragent = source["useragent"];
+	        this.browser = source["browser"];
+	        this.os = source["os"];
+	        this.screen = source["screen"];
+	        this.language = source["language"];
+	        this.cpu = source["cpu"];
+	        this.memory = source["memory"];
 	    }
+	}
+	export class ProfileInfoResponse {
+	    code: number;
+	    status: string;
+	    data: Profile;
+	
+	    static createFrom(source: any = {}) {
+	        return new ProfileInfoResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.status = source["status"];
+	        this.data = this.convertValues(source["data"], Profile);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class ProfileResponse {
 	    code: number;

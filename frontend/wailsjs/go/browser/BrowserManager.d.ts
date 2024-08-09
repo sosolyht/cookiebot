@@ -4,6 +4,8 @@ import {browser} from '../models';
 
 export function AddProfile(arg1:browser.CreateProfileRequest):Promise<{[key: string]: any}>;
 
+export function FetchProfileInfo(arg1:string):Promise<browser.ProfileInfoResponse>;
+
 export function FetchProfiles():Promise<browser.ProfileResponse>;
 
 export function LaunchProfile(arg1:string):Promise<{[key: string]: any}>;
