@@ -1,68 +1,54 @@
-// frontend\src\sidebar\MainSidebar.tsx
-
 import React from 'react';
-import { Shield, Monitor, Mail, Menu, ShoppingCart } from 'lucide-react';
+import { Mail, ShoppingCart, Menu } from 'lucide-react';
+import AntiDetectStatus from '../components/AntiDetectStatus';
 
 interface MainSidebarProps {
-    isAntiDetect: boolean;
-    setIsAntiDetect: React.Dispatch<React.SetStateAction<boolean>>;
-    status: string;
-    statusColor: string;
-    onMenuChange: (view: 'status' | 'gmail' | 'amazon' | 'other') => void;
-    currentView: 'status' | 'gmail' | 'amazon' | 'other';
+    onStatusChange: (status: string, color: string, installed: boolean) => void;
+    onMenuChange: (view: 'gmail' | 'amazon' | 'other') => void;
+    currentView: 'gmail' | 'amazon' | 'other';
+    initialStatus: string;
+    initialStatusColor: string;
+    initialIsInstalled: boolean;
 }
 
 const MainSidebar: React.FC<MainSidebarProps> = ({
-                                                     isAntiDetect,
-                                                     setIsAntiDetect,
-                                                     status,
-                                                     statusColor,
+                                                     onStatusChange,
                                                      onMenuChange,
-                                                     currentView
+                                                     currentView,
+                                                     initialStatus,
+                                                     initialStatusColor,
+                                                     initialIsInstalled
                                                  }) => {
     return (
-        <div className="w-64 bg-gray-100 dark:bg-gray-800 p-4 flex flex-col items-center">
-            <div
-                className="relative w-16 h-8 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-1 cursor-pointer mb-8"
-                onClick={() => setIsAntiDetect(prev => !prev)}>
-                <div
-                    className={`absolute w-6 h-6 rounded-full transition-transform duration-300 flex items-center justify-center ${
-                        isAntiDetect
-                            ? 'bg-blue-500 transform translate-x-0'
-                            : 'bg-gray-500 transform translate-x-8'
-                    }`}>
-                    {isAntiDetect ? (
-                        <Shield className="w-4 h-4 text-white"/>
-                    ) : (
-                        <Monitor className="w-4 h-4 text-white"/>
-                    )}
+        <div className="w-full sm:w-64 bg-gray-100 dark:bg-gray-800 p-4 flex flex-col h-screen">
+            <div className="mb-6 flex justify-center">
+                <div className="w-full">
+                    <AntiDetectStatus
+                        onStatusChange={onStatusChange}
+                        initialStatus={initialStatus}
+                        initialStatusColor={initialStatusColor}
+                        initialIsInstalled={initialIsInstalled}
+                    />
                 </div>
             </div>
-            <div className="space-y-2 w-full">
-                <button
-                    onClick={() => onMenuChange('status')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'status' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                >
-                    <Shield className="w-5 h-5 mr-2"/>
-                    상태
-                </button>
+            <div className="space-y-4 flex-grow">
                 <button
                     onClick={() => onMenuChange('gmail')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'gmail' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    className={`flex items-center w-full py-2 px-4 rounded text-sm whitespace-nowrap ${currentView === 'gmail' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                 >
                     <Mail className="w-5 h-5 mr-2"/>
                     Gmail 계정
                 </button>
                 <button
                     onClick={() => onMenuChange('amazon')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'amazon' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    className={`flex items-center w-full py-2 px-4 rounded text-sm whitespace-nowrap ${currentView === 'amazon' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                 >
                     <ShoppingCart className="w-5 h-5 mr-2"/>
                     Amazon 프로필
                 </button>
                 <button
                     onClick={() => onMenuChange('other')}
-                    className={`flex items-center w-full py-2 px-4 rounded ${currentView === 'other' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                    className={`flex items-center w-full py-2 px-4 rounded text-sm whitespace-nowrap ${currentView === 'other' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                 >
                     <Menu className="w-5 h-5 mr-2"/>
                     기타

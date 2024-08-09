@@ -1,19 +1,16 @@
-// frontend/src/App.tsx
+// frontend\src\App.tsx
 
 import React, { useState, useEffect } from 'react';
-import AntiDetectStatus from './components/AntiDetectStatus';
 import MainSidebar from './sidebar/MainSidebar';
 import GmailAccount from './pages/GmailAccount';
 import AmazonProfile from "./pages/AmazonProfile";
-import VM from './pages/VM';
-import { Sun, Moon, Download } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(true);
-    const [isAntiDetect, setIsAntiDetect] = useState(true);
-    const [currentView, setCurrentView] = useState<'status' | 'gmail' | 'amazon' | 'other'>('status');
-    const [status, setStatus] = useState<string>("");
-    const [statusColor, setStatusColor] = useState<string>("");
+    const [currentView, setCurrentView] = useState<'gmail' | 'amazon' | 'other'>('gmail');
+    const [status, setStatus] = useState<string>("연결 안됨");
+    const [statusColor, setStatusColor] = useState<string>("red");
     const [isInstalled, setIsInstalled] = useState<boolean>(false);
 
     useEffect(() => {
@@ -35,13 +32,7 @@ function App() {
     };
 
     const renderContent = () => {
-        if (!isAntiDetect) {
-            return <VM />;
-        }
-
         switch (currentView) {
-            case 'status':
-                return <AntiDetectStatus onStatusChange={handleStatusChange} />;
             case 'gmail':
                 return <GmailAccount />;
             case 'amazon':
@@ -49,19 +40,19 @@ function App() {
             case 'other':
                 return <div>Other Content</div>;
             default:
-                return <AntiDetectStatus onStatusChange={handleStatusChange} />;
+                return <GmailAccount />;
         }
     };
 
     return (
         <div className={`min-h-screen flex bg-light-bg dark:bg-dark-bg text-text-dark dark:text-text-light transition-colors duration-300`}>
             <MainSidebar
-                isAntiDetect={isAntiDetect}
-                setIsAntiDetect={setIsAntiDetect}
-                status={status}
-                statusColor={statusColor}
+                onStatusChange={handleStatusChange}
                 onMenuChange={setCurrentView}
                 currentView={currentView}
+                initialStatus={status}
+                initialStatusColor={statusColor}
+                initialIsInstalled={isInstalled}
             />
             <div className="flex-1 p-8 relative flex items-center justify-center">
                 <button

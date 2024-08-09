@@ -22,6 +22,7 @@ interface Window {
                 CheckAndRunAntiDetect(): Promise<void>;
                 EnsureAntiDetectRunning(): Promise<void>;
                 IsAntiDetectInstalled(): Promise<boolean>;
+                IsAntiDetectRunning(): Promise<boolean>;
                 RunAntiDetect(): Promise<void>;
             }
         },

@@ -1,3 +1,7 @@
+/* frontend/src/styles.css */
+
+/* frontend\src\styles.css */
+
 /* frontend\src\styles.css */
 
 @tailwind base;
@@ -8,6 +12,7 @@
     font-family: "Freesentation";
     src: url("assets/fonts/Freesentation.ttf") format("truetype");
 }
+
 html {
     background-color: rgba(27, 38, 54, 1);
     text-align: center;

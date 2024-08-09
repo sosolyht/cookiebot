@@ -15,7 +15,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 	"go.uber.org/zap"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -27,7 +26,7 @@ var assets embed.FS
 var configFile embed.FS
 
 func main() {
-	logger, err := InitializeLogger()
+	logger, err := utils.InitializeLogger()
 	if err != nil {
 		fmt.Printf("Failed to initialize logger: %v\n", err)
 		return
@@ -35,7 +34,7 @@ func main() {
 	defer logger.Sync()
 
 	// config.json 파일을 임시 디렉토리에 저장
-	tempDir, err := ioutil.TempDir("", "config")
+	tempDir, err := os.MkdirTemp("", "config")
 	if err != nil {
 		logger.Error("Failed to create temp directory", zap.Error(err))
 		return
@@ -49,7 +48,7 @@ func main() {
 		return
 	}
 
-	err = ioutil.WriteFile(configPath, configData, 0644)
+	err = os.WriteFile(configPath, configData, 0644)
 	if err != nil {
 		logger.Error("Failed to write config file to temp directory", zap.Error(err))
 		return

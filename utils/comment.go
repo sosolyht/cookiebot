@@ -51,12 +51,13 @@ func addComments(path string, info fs.FileInfo, err error) error {
 			}
 		}
 
-		// Create the comment line
+		// Create the comment line with forward slashes
+		normalizedPath := filepath.ToSlash(path)
 		var comment string
 		if ext == ".go" || ext == ".tsx" {
-			comment = fmt.Sprintf("// %s", path)
+			comment = fmt.Sprintf("// %s", normalizedPath)
 		} else if ext == ".css" {
-			comment = fmt.Sprintf("/* %s */", path)
+			comment = fmt.Sprintf("/* %s */", normalizedPath)
 		}
 
 		// Prepend the comment to the file content
@@ -69,7 +70,7 @@ func addComments(path string, info fs.FileInfo, err error) error {
 			return err
 		}
 
-		fmt.Printf("Added comment to %s\n", path)
+		fmt.Printf("Added comment to %s\n", normalizedPath)
 	}
 
 	return nil
