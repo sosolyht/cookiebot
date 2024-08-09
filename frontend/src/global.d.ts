@@ -39,7 +39,9 @@ interface Window {
                 AddProfile(arg1: string): Promise<void>;
                 FetchProfiles(): Promise<Array<string>>;
                 LaunchProfile(arg1: string): Promise<void>;
-                ModifyProfile(arg1: string, arg2: string): Promise<void>;
+                // window.go.browser.BrowserManager의 ModifyProfile 메서드 정의
+                ModifyProfile(profileID: string, req: ModifyProfileRequest): Promise<any>;
+
                 RemoveProfile(arg1: string): Promise<void>;
                 TerminateProfile(arg1: string): Promise<void>;
             }

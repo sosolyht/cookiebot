@@ -1,7 +1,9 @@
+// frontend/src/pages/BrowserProfile.tsx
+
 import React, { useEffect, useState } from 'react';
 import { Play, Pause, StopCircle, Settings } from 'lucide-react';
-import IPInfo from '../components/IPInfo'; // IPInfo 컴포넌트 임포트
-import ProfileSettingsModal from './ProfileSettingsModal'; // 모달 컴포넌트 임포트
+import IPInfo from '../components/IPInfo';
+import ProfileSettingsModal from './ProfileSettingsModal';
 
 interface Profile {
     id: string;
@@ -45,7 +47,7 @@ const BrowserProfile: React.FC = () => {
             if (response && response.status === "success" && response.data) {
                 const profilesArray: Profile[] = Object.values(response.data).map((profile) => ({
                     ...profile,
-                    creation_date: profile.creation_date * 1000, // Unix timestamp를 밀리초로 변환
+                    creation_date: profile.creation_date * 1000,
                 }));
                 setProfiles(profilesArray);
             } else {
@@ -84,25 +86,6 @@ const BrowserProfile: React.FC = () => {
         return <div className="text-center text-red-500">Error: {error}</div>;
     }
 
-    const handleStart = (profileName: string) => {
-        console.log(`Starting ${profileName}`);
-        // 여기에 시작 로직을 추가하십시오.
-    };
-
-    const handlePause = (profileName: string) => {
-        console.log(`Pausing ${profileName}`);
-        // 여기에 일시중지 로직을 추가하십시오.
-    };
-
-    const handleStop = (profileName: string) => {
-        console.log(`Stopping ${profileName}`);
-        // 여기에 중지 로직을 추가하십시오.
-    };
-
-    const handleSettings = (profile: Profile) => {
-        handleProfileSettingsOpen(profile);
-    };
-
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
             <div className="w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
@@ -115,9 +98,6 @@ const BrowserProfile: React.FC = () => {
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">상태</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">IP 정보</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">생성 날짜</th>
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">실행</th>
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">일시중지</th>
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">정지</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">설정</th>
                             </tr>
                             </thead>
@@ -131,22 +111,7 @@ const BrowserProfile: React.FC = () => {
                                     </td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{new Date(profile.creation_date).toLocaleString()}</td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <button onClick={() => handleStart(profile.name)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
-                                            <Play className="h-5 w-5" />
-                                        </button>
-                                    </td>
-                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <button onClick={() => handlePause(profile.name)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
-                                            <Pause className="h-5 w-5" />
-                                        </button>
-                                    </td>
-                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <button onClick={() => handleStop(profile.name)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
-                                            <StopCircle className="h-5 w-5" />
-                                        </button>
-                                    </td>
-                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <button onClick={() => handleSettings(profile)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
+                                        <button onClick={() => handleProfileSettingsOpen(profile)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
                                             <Settings className="h-5 w-5" />
                                         </button>
                                     </td>
@@ -162,7 +127,7 @@ const BrowserProfile: React.FC = () => {
                     isOpen={isSettingsModalOpen}
                     onClose={handleProfileSettingsClose}
                     profileID={selectedProfile.id}
-                    initialData={selectedProfile}
+                    initialData={selectedProfile} // 선택된 프로필 데이터를 전달
                     onUpdate={handleProfileUpdate}
                 />
             )}

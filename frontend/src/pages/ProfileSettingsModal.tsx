@@ -3,14 +3,17 @@
 import React, { useState } from 'react';
 
 interface ModifyProfileRequest {
-    proxy?: string;
-    notes?: string;
-    name?: string;
-    folder?: string;
-    tags?: string[];
-    geolocation?: string;
-    accounts?: Array<{ website: string; username: string; password: string }>;
-    timezone?: string;
+    proxy: string; // 비어있으면 빈 문자열로 설정
+    notes: string; // 비어있으면 빈 문자열로 설정
+    name: string; // 비어있으면 빈 문자열로 설정
+    folder: string; // 비어있으면 빈 문자열로 설정
+    tags: string[]; // 비어있으면 빈 배열로 설정
+    geolocation: string; // 비어있으면 빈 문자열로 설정
+    cookies: object[]; // 빈 배열로 설정
+    type: string; // 비어있으면 빈 문자열로 설정
+    group: string; // 비어있으면 빈 문자열로 설정
+    accounts: Array<{ website: string; username: string; password: string }>; // 빈 배열로 설정
+    timezone: string; // 비어있으면 빈 문자열로 설정
 }
 
 interface ProfileSettingsModalProps {
@@ -39,28 +42,39 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
     const [geolocation, setGeolocation] = useState(initialData.geolocation || '');
     const [accounts, setAccounts] = useState(initialData.accounts || []);
     const [timezone, setTimezone] = useState(initialData.timezone || '');
+    const [type, setType] = useState(''); // 기본값으로 빈 문자열 설정
+    const [group, setGroup] = useState(''); // 기본값으로 빈 문자열 설정
 
     const handleUpdate = async () => {
         const updateData: ModifyProfileRequest = {
-            proxy: proxy || undefined,
-            notes: notes || undefined,
-            name: name || undefined,
-            folder: folder || undefined,
-            tags: tags.length > 0 ? tags : undefined,
-            geolocation: geolocation || undefined,
-            accounts: accounts.length > 0 ? accounts : undefined,
-            timezone: timezone || undefined,
+            proxy: proxy || '',
+            notes: notes || '',
+            name: name || '',
+            folder: folder || '',
+            tags: tags.length > 0 ? tags : [],
+            geolocation: geolocation || '',
+            cookies: [{}], // 빈 객체 배열로 설정 (필요에 따라 수정)
+            type: type || '', // 비어있으면 빈 문자열로 설정
+            group: group || '', // 비어있으면 빈 문자열로 설정
+            accounts: accounts.length > 0 ? accounts : [], // 빈 배열로 설정
+            timezone: timezone || '', // 비어있으면 빈 문자열로 설정
         };
 
+        // JSON 형식으로 변환하여 콘솔에 출력
+        console.log("업데이트할 데이터:", updateData, null, 2);
+
         try {
-            // 데이터를 JSON 문자열로 변환하여 API 호출
-            await window.go.browser.BrowserManager.ModifyProfile(profileID, JSON.stringify(updateData));
+            // JSON 문자열로 변환하여 전달
+            await window.go.browser.BrowserManager.ModifyProfile(profileID, updateData);
             onUpdate(updateData);
             onClose();
+            console.log(JSON.stringify(updateData))
         } catch (error) {
             console.error("프로필 업데이트 오류:", error);
         }
     };
+
+
 
     const handleAddAccount = () => {
         setAccounts([...accounts, { website: '', username: '', password: '' }]);
