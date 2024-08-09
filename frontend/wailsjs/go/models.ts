@@ -1,12 +1,12 @@
 export namespace browser {
 	
-	export class  {
+	export class Account {
 	    website: string;
 	    username: string;
 	    password: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new (source);
+	        return new Account(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -16,16 +16,18 @@ export namespace browser {
 	        this.password = source["password"];
 	    }
 	}
-	export class  {
-	
+	export class Cookie {
+	    name: string;
+	    value: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new (source);
+	        return new Cookie(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	
+	        this.name = source["name"];
+	        this.value = source["value"];
 	    }
 	}
 	export class CreateProfileRequest {
@@ -41,11 +43,11 @@ export namespace browser {
 	    notes: string;
 	    folder: string;
 	    language: string;
-	    cookies: [];
+	    cookies: Cookie[];
+	    accounts: Account[];
 	    type: string;
 	    group: string;
 	    configid: string;
-	    accounts: [];
 	    timezone: string;
 	
 	    static createFrom(source: any = {}) {
@@ -66,11 +68,11 @@ export namespace browser {
 	        this.notes = source["notes"];
 	        this.folder = source["folder"];
 	        this.language = source["language"];
-	        this.cookies = this.convertValues(source["cookies"], );
+	        this.cookies = this.convertValues(source["cookies"], Cookie);
+	        this.accounts = this.convertValues(source["accounts"], Account);
 	        this.type = source["type"];
 	        this.group = source["group"];
 	        this.configid = source["configid"];
-	        this.accounts = this.convertValues(source["accounts"], );
 	        this.timezone = source["timezone"];
 	    }
 	

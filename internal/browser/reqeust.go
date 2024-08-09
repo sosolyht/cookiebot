@@ -50,30 +50,39 @@ type ProfileResponse struct {
 	Data   map[string]Profile `json:"data"`
 }
 
-// CreateProfileRequest 구조체 정의
+// Cookie 구조체 정의
+type Cookie struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// Account 구조체 정의
+type Account struct {
+	Website  string `json:"website"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+// CreateProfileRequest 구조체 수정
 type CreateProfileRequest struct {
-	Name        string     `json:"name"`
-	OS          string     `json:"os"`
-	Browser     string     `json:"browser"`
-	CPU         int        `json:"cpu"`
-	Memory      int        `json:"memory"`
-	Tags        []string   `json:"tags"`
-	Geolocation string     `json:"geolocation"`
-	Resolution  string     `json:"resolution"`
-	Proxy       string     `json:"proxy"`
-	Notes       string     `json:"notes"`
-	Folder      string     `json:"folder"`
-	Language    string     `json:"language"`
-	Cookies     []struct{} `json:"cookies"`
-	Type        string     `json:"type"`
-	Group       string     `json:"group"`
-	ConfigID    string     `json:"configid"`
-	Accounts    []struct {
-		Website  string `json:"website"`
-		Username string `json:"username"`
-		Password string `json:"password"`
-	} `json:"accounts"`
-	Timezone string `json:"timezone"`
+	Name        string    `json:"name"`
+	OS          string    `json:"os"`
+	Browser     string    `json:"browser"`
+	CPU         int       `json:"cpu"`
+	Memory      int       `json:"memory"`
+	Tags        []string  `json:"tags"`
+	Geolocation string    `json:"geolocation"`
+	Resolution  string    `json:"resolution"`
+	Proxy       string    `json:"proxy"`
+	Notes       string    `json:"notes"`
+	Folder      string    `json:"folder"`
+	Language    string    `json:"language"`
+	Cookies     []Cookie  `json:"cookies"`  // 변경된 부분
+	Accounts    []Account `json:"accounts"` // 변경된 부분
+	Type        string    `json:"type"`
+	Group       string    `json:"group"`
+	ConfigID    string    `json:"configid"`
+	Timezone    string    `json:"timezone"`
 }
 
 // FetchProfiles 메서드 정의

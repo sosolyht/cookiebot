@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Pause, StopCircle, Settings } from 'lucide-react';
+import IPInfo from '../components/IPInfo'; // IPInfo 컴포넌트 임포트
+import ProfileSettingsModal from './ProfileSettingsModal'; // 모달 컴포넌트 임포트
 
 interface Profile {
+    id: string;
     name: string;
     status: string;
     creation_date: number;
+    ip: string;
+    proxy?: string;
+    notes?: string;
+    folder?: string;
+    tags?: string[];
+    geolocation?: string;
+    accounts?: Array<{ website: string; username: string; password: string }>;
+    timezone?: string;
 }
 
 interface ApiResponse {
@@ -19,6 +30,8 @@ const BrowserProfile: React.FC = () => {
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
     useEffect(() => {
         fetchProfiles();
@@ -31,9 +44,8 @@ const BrowserProfile: React.FC = () => {
             const response = await window.go.browser.BrowserManager.FetchProfiles() as unknown as ApiResponse;
             if (response && response.status === "success" && response.data) {
                 const profilesArray: Profile[] = Object.values(response.data).map((profile) => ({
-                    name: profile.name,
-                    status: profile.status,
-                    creation_date: profile.creation_date * 1000,
+                    ...profile,
+                    creation_date: profile.creation_date * 1000, // Unix timestamp를 밀리초로 변환
                 }));
                 setProfiles(profilesArray);
             } else {
@@ -43,6 +55,24 @@ const BrowserProfile: React.FC = () => {
             setError("Failed to fetch profiles: " + (error as Error).message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleProfileSettingsOpen = (profile: Profile) => {
+        setSelectedProfile(profile);
+        setIsSettingsModalOpen(true);
+    };
+
+    const handleProfileSettingsClose = () => {
+        setSelectedProfile(null);
+        setIsSettingsModalOpen(false);
+    };
+
+    const handleProfileUpdate = (updatedProfile: Partial<Profile>) => {
+        if (selectedProfile) {
+            setProfiles(profiles.map(profile =>
+                profile.id === selectedProfile.id ? { ...profile, ...updatedProfile } : profile
+            ));
         }
     };
 
@@ -69,9 +99,8 @@ const BrowserProfile: React.FC = () => {
         // 여기에 중지 로직을 추가하십시오.
     };
 
-    const handleSettings = (profileName: string) => {
-        console.log(`Opening settings for ${profileName}`);
-        // 여기에 설정 로직을 추가하십시오.
+    const handleSettings = (profile: Profile) => {
+        handleProfileSettingsOpen(profile);
     };
 
     return (
@@ -84,6 +113,8 @@ const BrowserProfile: React.FC = () => {
                             <tr className="bg-gray-100 dark:bg-gray-800">
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-left">프로필명</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">상태</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">IP 정보</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">생성 날짜</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">실행</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">일시중지</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">정지</th>
@@ -91,10 +122,14 @@ const BrowserProfile: React.FC = () => {
                             </tr>
                             </thead>
                             <tbody>
-                            {profiles.map((profile, index) => (
-                                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            {profiles.map((profile) => (
+                                <tr key={profile.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{profile.name}</td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{profile.status}</td>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                        <IPInfo ip={profile.ip} />
+                                    </td>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{new Date(profile.creation_date).toLocaleString()}</td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
                                         <button onClick={() => handleStart(profile.name)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
                                             <Play className="h-5 w-5" />
@@ -111,7 +146,7 @@ const BrowserProfile: React.FC = () => {
                                         </button>
                                     </td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <button onClick={() => handleSettings(profile.name)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
+                                        <button onClick={() => handleSettings(profile)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
                                             <Settings className="h-5 w-5" />
                                         </button>
                                     </td>
@@ -122,6 +157,15 @@ const BrowserProfile: React.FC = () => {
                     </div>
                 </div>
             </div>
+            {selectedProfile && (
+                <ProfileSettingsModal
+                    isOpen={isSettingsModalOpen}
+                    onClose={handleProfileSettingsClose}
+                    profileID={selectedProfile.id}
+                    initialData={selectedProfile}
+                    onUpdate={handleProfileUpdate}
+                />
+            )}
         </div>
     );
 };
