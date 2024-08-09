@@ -41,7 +41,7 @@ interface Window {
                 LaunchProfile(arg1: string): Promise<void>;
                 ModifyProfile(profileID: string, req: ModifyProfileRequest): Promise<any>;
                 RemoveProfile(arg1: string): Promise<void>;
-                TerminateProfile(arg1: string): Promise<void>;
+                StopProfile(arg1: string): Promise<void>;
                 FetchProfileInfo(profileID: string): Promise<ProfileInfoResponse>; // 추가된 부분
             }
         }

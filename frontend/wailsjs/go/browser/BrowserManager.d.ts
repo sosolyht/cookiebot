@@ -14,4 +14,4 @@ export function ModifyProfile(arg1:string,arg2:browser.CreateProfileRequest):Pro
 
 export function RemoveProfile(arg1:string):Promise<{[key: string]: any}>;
 
-export function TerminateProfile(arg1:string):Promise<{[key: string]: any}>;
+export function StopProfile(arg1:string):Promise<{[key: string]: any}>;

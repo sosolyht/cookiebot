@@ -1,14 +1,14 @@
 // frontend/src/pages/BrowserProfile.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Play, Pause, StopCircle, Settings } from 'lucide-react';
+import { Play, StopCircle, Settings } from 'lucide-react';
 import IPInfo from '../components/IPInfo';
 import ProfileSettingsModal from './ProfileSettingsModal';
 
 interface Profile {
     id: string;
     name: string;
-    status: string;
+    status: string; // "running" 또는 "stopped" 상태로 가정
     creation_date: number;
     ip: string; // 기본 IP 정보
     proxy?: string; // 프록시 정보
@@ -43,7 +43,6 @@ const BrowserProfile: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            // 1단계: 프로필 목록을 가져옵니다.
             const response = await window.go.browser.BrowserManager.FetchProfiles() as unknown as ApiResponse;
 
             if (response && response.status === "success" && response.data) {
@@ -54,16 +53,14 @@ const BrowserProfile: React.FC = () => {
                         if (profileInfoResponse && profileInfoResponse.status === "success" && profileInfoResponse.data) {
                             const profileInfo = profileInfoResponse.data;
 
-                            // 프록시가 있을 경우 IP를 설정
                             const ip = profileInfo.proxy ? await getProxyIP(profileInfo.proxy) : '';
 
-                            // 2단계: 프로필 정보를 반환합니다.
                             return {
                                 id: profileId,
                                 name: profileInfo.name,
                                 status: profileInfo.status,
-                                creation_date: profileInfo.creation_date ? profileInfo.creation_date * 1000 : 0, // 기본값 설정
-                                ip: ip, // 프록시에서 가져온 IP
+                                creation_date: profileInfo.creation_date ? profileInfo.creation_date * 1000 : 0,
+                                ip: ip,
                                 proxy: profileInfo.proxy,
                                 folder: profileInfo.folder,
                                 tags: profileInfo.tags,
@@ -75,19 +72,18 @@ const BrowserProfile: React.FC = () => {
                                 language: profileInfo.language,
                                 cpu: profileInfo.cpu,
                                 memory: profileInfo.memory,
-                                debug_port: profileInfo.debug_port, // Profile에 맞추어 추가
-                                websocket_link: profileInfo.websocket_link, // Profile에 맞추어 추가
-                                cloud_id: profileInfo.cloud_id, // Profile에 맞추어 추가
-                                modify_date: profileInfo.modify_date // Profile에 맞추어 추가
-                            } as Profile; // 타입 단언
+                                debug_port: profileInfo.debug_port,
+                                websocket_link: profileInfo.websocket_link,
+                                cloud_id: profileInfo.cloud_id,
+                                modify_date: profileInfo.modify_date
+                            } as Profile;
                         } else {
                             setError("Failed to fetch profile info for ID: " + profileId);
-                            return null; // 프로필 정보를 가져오지 못한 경우 null을 반환
+                            return null;
                         }
                     })
                 );
 
-                // null 값을 필터링하여 Profile[] 타입으로 설정
                 const filteredProfilesArray: Profile[] = profilesArray.filter((profile): profile is Profile => profile !== null);
                 setProfiles(filteredProfilesArray);
             } else {
@@ -100,16 +96,11 @@ const BrowserProfile: React.FC = () => {
         }
     };
 
-
-
-    // 프록시 IP를 가져오는 함수
     const getProxyIP = async (proxy: string): Promise<string> => {
         const proxyParts = proxy.split(':');
-        // 프록시 IP를 가져옵니다. 예: socks5://123.45.67.89:1080 -> 123.45.67.89
         const ip = proxyParts[1].replace('socks5://', '').replace('http://', '');
         return ip;
     };
-
 
     const handleProfileSettingsOpen = (profile: Profile) => {
         setSelectedProfile(profile);
@@ -129,6 +120,30 @@ const BrowserProfile: React.FC = () => {
         }
     };
 
+    const handleStopProfile = async (profileId: string) => {
+        try {
+            await window.go.browser.BrowserManager.StopProfile(profileId);
+            // 프로필 상태를 "stopped"로 업데이트
+            setProfiles(profiles.map(profile =>
+                profile.id === profileId ? { ...profile, status: "stopped" } : profile
+            ));
+        } catch (error) {
+            console.error("Failed to stop profile:", error);
+        }
+    };
+
+    const handleStartProfile = async (profileId: string) => {
+        try {
+            await window.go.browser.BrowserManager.LaunchProfile(profileId);
+            // 프로필 상태를 "running"으로 업데이트
+            setProfiles(profiles.map(profile =>
+                profile.id === profileId ? { ...profile, status: "running" } : profile
+            ));
+        } catch (error) {
+            console.error("Failed to start profile:", error);
+        }
+    };
+
     if (loading) {
         return <div className="text-center">Loading...</div>;
     }
@@ -145,11 +160,15 @@ const BrowserProfile: React.FC = () => {
                         <table className="w-full border-collapse text-sm">
                             <thead>
                             <tr className="bg-gray-100 dark:bg-gray-800">
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-left">프로필명</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">프로필명</th>
                                 <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">상태</th>
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">IP 정보</th>
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">생성 날짜</th>
-                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">설정</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">IP
+                                    정보
+                                </th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">생성
+                                    날짜
+                                </th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">작업</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -158,17 +177,52 @@ const BrowserProfile: React.FC = () => {
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{profile.name}</td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{profile.status}</td>
                                     <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <IPInfo ip={profile.ip} />
+                                        <IPInfo ip={profile.ip}/>
                                     </td>
-                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">{new Date(profile.creation_date).toLocaleString()}</td>
-                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <button onClick={() => handleProfileSettingsOpen(profile)} className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
-                                            <Settings className="h-5 w-5" />
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">
+                                        {new Date(profile.creation_date).toLocaleString('ko-KR', {
+                                            year: 'numeric',
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true, // 오전/오후 표시
+                                        }).replace(',', '').replace(/\//g, '.').replace(' ', ' ')}
+                                    </td>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center flex justify-center space-x-2">
+                                        {profile.status === "running" ? (
+                                            <>
+                                                <button onClick={() => handleStopProfile(profile.id)}
+                                                        className="flex items-center justify-center w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full">
+                                                    <StopCircle className="h-5 w-5"/>
+                                                </button>
+                                                <button disabled
+                                                        className="flex items-center justify-center w-8 h-8 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">
+                                                    <Play className="h-5 w-5"/>
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => handleStartProfile(profile.id)}
+                                                        className="flex items-center justify-center w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full">
+                                                    <Play className="h-5 w-5"/>
+                                                </button>
+                                                <button disabled
+                                                        className="flex items-center justify-center w-8 h-8 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">
+                                                    <StopCircle className="h-5 w-5"/>
+                                                </button>
+                                            </>
+                                        )}
+                                        <button onClick={() => handleProfileSettingsOpen(profile)}
+                                                className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600">
+                                            <Settings className="h-5 w-5"/>
                                         </button>
                                     </td>
+
                                 </tr>
                             ))}
                             </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -178,7 +232,7 @@ const BrowserProfile: React.FC = () => {
                     isOpen={isSettingsModalOpen}
                     onClose={handleProfileSettingsClose}
                     profileID={selectedProfile.id}
-                    initialData={selectedProfile} // 선택된 프로필 데이터를 전달
+                    initialData={selectedProfile}
                     onUpdate={handleProfileUpdate}
                 />
             )}

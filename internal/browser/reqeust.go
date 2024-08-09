@@ -185,12 +185,12 @@ func (bm *BrowserManager) LaunchProfile(profileID string) (map[string]interface{
 	return response, nil
 }
 
-// TerminateProfile 메서드 정의
-func (bm *BrowserManager) TerminateProfile(profileID string) (map[string]interface{}, error) {
-	bm.logger.Info("Terminating profile", zap.String("profileID", profileID))
+// StopProfile 메서드 정의
+func (bm *BrowserManager) StopProfile(profileID string) (map[string]interface{}, error) {
+	bm.logger.Info("Stop profile", zap.String("profileID", profileID))
 	resp, err := http.Get(fmt.Sprintf("%s/profile/stop/%s", BASE_URL, profileID))
 	if err != nil {
-		bm.logger.Error("Failed to terminate profile", zap.String("profileID", profileID), zap.Error(err))
+		bm.logger.Error("Failed to stop profile", zap.String("profileID", profileID), zap.Error(err))
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -200,7 +200,7 @@ func (bm *BrowserManager) TerminateProfile(profileID string) (map[string]interfa
 		bm.logger.Error("Failed to decode terminate profile response", zap.Error(err))
 		return nil, err
 	}
-	bm.logger.Info("Successfully terminated profile", zap.String("profileID", profileID))
+	bm.logger.Info("Successfully stop profile", zap.String("profileID", profileID))
 	return response, nil
 }
 

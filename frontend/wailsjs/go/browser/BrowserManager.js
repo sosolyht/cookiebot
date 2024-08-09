@@ -26,6 +26,6 @@ export function RemoveProfile(arg1) {
   return window['go']['browser']['BrowserManager']['RemoveProfile'](arg1);
 }
 
-export function TerminateProfile(arg1) {
-  return window['go']['browser']['BrowserManager']['TerminateProfile'](arg1);
+export function StopProfile(arg1) {
+  return window['go']['browser']['BrowserManager']['StopProfile'](arg1);
 }

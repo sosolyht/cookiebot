@@ -8,7 +8,7 @@ import { Sun, Moon } from 'lucide-react';
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(true);
-    const [currentView, setCurrentView] = useState<'profile' | 'gmail' |  'other'>('profile');
+    const [currentView, setCurrentView] = useState<'profile' | 'gmail'>('profile');
     const [status, setStatus] = useState<string>("연결 안됨");
     const [statusColor, setStatusColor] = useState<string>("red");
     const [isInstalled, setIsInstalled] = useState<boolean>(false);
@@ -37,10 +37,8 @@ function App() {
                 return <BrowserProfile />;
             case 'gmail':
                 return <GmailAccount />;
-            case 'other':
-                return <div>Other Content</div>;
             default:
-                return <GmailAccount />;
+                return <BrowserProfile />;
         }
     };
 
