@@ -1,4 +1,4 @@
-// internal\anti\antiDetectDownload.go
+// internal/anti/antiDetectDownload.go
 
 package antidetect
 
@@ -31,8 +31,8 @@ type ADD struct {
 	mu     sync.Mutex
 }
 
-func AntiDetectDownload(logger *zap.Logger) *ADD {
-	return &ADD{logger: logger}
+func AntiDetectDownload(ctx context.Context, logger *zap.Logger) *ADD {
+	return &ADD{ctx: ctx, logger: logger}
 }
 
 func (a *ADD) IsAntiDetectInstalled() (bool, error) {
@@ -129,7 +129,14 @@ func (a *ADD) downloadFile(filePath, url string) error {
 	}
 	defer out.Close()
 
-	resp, err := http.Get(url)
+	// HTTP 요청을 위한 ctx 사용
+	req, err := http.NewRequestWithContext(a.ctx, "GET", url, nil)
+	if err != nil {
+		a.logger.Error("Failed to create HTTP request", zap.Error(err))
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		a.logger.Error("Failed to initiate download", zap.Error(err))
 		return err

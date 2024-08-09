@@ -33,6 +33,16 @@ interface Window {
                 ListEmails(): Promise<Array<GmailAccount>>;
                 SaveEmail(arg1: GmailAccount): Promise<void>;
             }
+        },
+        browser: {
+            BrowserManager: {
+                AddProfile(arg1: string): Promise<void>;
+                FetchProfiles(): Promise<Array<string>>;
+                LaunchProfile(arg1: string): Promise<void>;
+                ModifyProfile(arg1: string, arg2: string): Promise<void>;
+                RemoveProfile(arg1: string): Promise<void>;
+                TerminateProfile(arg1: string): Promise<void>;
+            }
         }
     }
 }

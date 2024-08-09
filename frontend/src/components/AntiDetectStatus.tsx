@@ -1,3 +1,5 @@
+// frontend/src/components/AntiDetectStatus.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Download, CheckCircle, AlertCircle, Play } from 'lucide-react';
 

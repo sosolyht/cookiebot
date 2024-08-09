@@ -3,7 +3,9 @@
 package main
 
 import (
+	"context" // context 패키지 임포트 추가
 	antidetect "cookieBot/internal/anti"
+	"cookieBot/internal/browser"
 	"cookieBot/internal/db"
 	"cookieBot/internal/vm"
 	"cookieBot/utils"
@@ -54,9 +56,13 @@ func main() {
 		return
 	}
 
+	// context.Context 생성
+	ctx := context.Background() // 새로운 컨텍스트 생성
+
 	vmMain := vm.VMMain(logger)
 	vmDownload := vm.VMDownload(logger)
-	antiDownload := antidetect.AntiDetectDownload(logger)
+	antiDownload := antidetect.AntiDetectDownload(ctx, logger) // ctx 전달
+	browserManager := browser.NewBrowserManager(ctx, logger)   // ctx 전달
 
 	// EmailDB 초기화
 	emailDB, err := db.NewEmailDB(configPath)
@@ -89,6 +95,7 @@ func main() {
 			vmDownload,
 			antiDownload,
 			emailDB,
+			browserManager,
 		},
 	})
 

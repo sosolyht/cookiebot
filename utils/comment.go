@@ -1,4 +1,4 @@
-// utils\comment.go
+// utils/comment.go
 
 package utils
 
@@ -44,9 +44,9 @@ func addComments(path string, info fs.FileInfo, err error) error {
 
 		// Check if the first line is already a comment
 		if len(lines) > 0 {
-			if (ext == ".go" || ext == ".tsx") && strings.HasPrefix(lines[0], "//") {
+			if (ext == ".go" || ext == ".tsx") && strings.HasPrefix(strings.TrimSpace(lines[0]), "//") {
 				return nil // Skip adding comment if already present
-			} else if ext == ".css" && strings.HasPrefix(lines[0], "/*") && strings.HasSuffix(lines[0], "*/") {
+			} else if ext == ".css" && strings.HasPrefix(strings.TrimSpace(lines[0]), "/*") && strings.HasSuffix(strings.TrimSpace(lines[0]), "*/") {
 				return nil // Skip adding comment if already present
 			}
 		}

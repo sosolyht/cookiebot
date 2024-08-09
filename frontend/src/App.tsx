@@ -1,14 +1,14 @@
-// frontend\src\App.tsx
+// frontend/src/App.tsx
 
 import React, { useState, useEffect } from 'react';
 import MainSidebar from './sidebar/MainSidebar';
 import GmailAccount from './pages/GmailAccount';
-import AmazonProfile from "./pages/AmazonProfile";
+import BrowserProfile from "./pages/BrowserProfile";
 import { Sun, Moon } from 'lucide-react';
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(true);
-    const [currentView, setCurrentView] = useState<'gmail' | 'amazon' | 'other'>('gmail');
+    const [currentView, setCurrentView] = useState<'profile' | 'gmail' |  'other'>('profile');
     const [status, setStatus] = useState<string>("연결 안됨");
     const [statusColor, setStatusColor] = useState<string>("red");
     const [isInstalled, setIsInstalled] = useState<boolean>(false);
@@ -33,10 +33,10 @@ function App() {
 
     const renderContent = () => {
         switch (currentView) {
+            case 'profile':
+                return <BrowserProfile />;
             case 'gmail':
                 return <GmailAccount />;
-            case 'amazon':
-                return <AmazonProfile />;
             case 'other':
                 return <div>Other Content</div>;
             default:

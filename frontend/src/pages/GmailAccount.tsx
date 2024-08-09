@@ -1,4 +1,4 @@
-// frontend\src\pages\GmailAccount.tsx
+// frontend/src/pages/GmailAccount.tsx
 
 import React, { useEffect, useState } from 'react';
 
@@ -14,14 +14,14 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; children: React.Re
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
                 {children}
             </div>
         </div>
-);
+    );
 };
 
-const GmailAccountPage: React.FC = () => { // 컴포넌트 이름 변경
+const GmailAccountPage: React.FC = () => {
     const [emailAccounts, setEmailAccounts] = useState<GmailAccount[]>([]);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
@@ -74,67 +74,61 @@ const GmailAccountPage: React.FC = () => { // 컴포넌트 이름 변경
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-            <div className="w-full max-w-7xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div className="w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <div className="p-6">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-sm">
                             <thead>
                             <tr className="bg-gray-100 dark:bg-gray-800">
-                                <th className="py-2 px-2 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">Gmail</th>
-                                <th className="py-2 px-2 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">비밀번호</th>
-                                <th className="py-2 px-2 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">복구 이메일</th>
-                                <th className="py-2 px-2 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 w-24 text-center">사용 여부</th>
-                                <th className="py-2 px-2 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 w-20 text-center">삭제</th>
-                                <th className="py-2 px-2 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 w-20 text-center">복사</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-left">Gmail</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-left">비밀번호</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-left">복구 이메일</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">사용 여부</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">삭제</th>
+                                <th className="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 text-center">복사</th>
                             </tr>
                             </thead>
                             <tbody>
                             {emailAccounts.map((account) => (
                                 <tr key={account.Email} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td className="py-2 px-2 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 truncate max-w-xs text-center">{account.Email}</td>
-                                    <td className="py-2 px-2 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 truncate max-w-xs text-center">{account.Password}</td>
-                                    <td className="py-2 px-2 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 truncate max-w-xs text-center">{account.RecoveryEmail}</td>
-                                    <td className="py-2 px-2 border-b border-gray-200 dark:border-gray-700">
-                                        <div className="flex justify-center">
-                                            <button
-                                                onClick={() => handleToggleUsed(account.Email, account.Used)}
-                                                className={`w-20 px-2 py-1 rounded transition duration-300 ease-in-out ${
-                                                    account.Used
-                                                        ? 'bg-green-500 text-white'
-                                                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                                                }`}
-                                            >
-                                                {account.Used ? '사용중' : '미사용'}
-                                            </button>
-                                        </div>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 truncate">{account.Email}</td>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 truncate">{account.Password}</td>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 truncate">{account.RecoveryEmail}</td>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                        <button
+                                            onClick={() => handleToggleUsed(account.Email, account.Used)}
+                                            className={`px-3 py-1 rounded transition duration-300 ease-in-out ${
+                                                account.Used
+                                                    ? 'bg-green-500 text-white'
+                                                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                                            }`}
+                                        >
+                                            {account.Used ? '사용중' : '미사용'}
+                                        </button>
                                     </td>
-                                    <td className="py-2 px-2 border-b border-gray-200 dark:border-gray-700">
-                                        <div className="flex justify-center">
-                                            <button
-                                                className="w-16 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded transition duration-300 ease-in-out"
-                                                onClick={() => {
-                                                    setSelectedEmail(account.Email);
-                                                    setIsDeleteModalOpen(true);
-                                                }}
-                                            >
-                                                삭제
-                                            </button>
-                                        </div>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                        <button
+                                            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded transition duration-300 ease-in-out"
+                                            onClick={() => {
+                                                setSelectedEmail(account.Email);
+                                                setIsDeleteModalOpen(true);
+                                            }}
+                                        >
+                                            삭제
+                                        </button>
                                     </td>
-                                    <td className="py-2 px-2 border-b border-gray-200 dark:border-gray-700">
-                                        <div className="flex justify-center">
-                                            <button
-                                                className={`w-16 px-2 py-1 rounded transition duration-300 ease-in-out ${
-                                                    account.Used
-                                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                                }`}
-                                                onClick={() => !account.Used && handleCopy(account.Email)}
-                                                disabled={account.Used}
-                                            >
-                                                복사
-                                            </button>
-                                        </div>
+                                    <td className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                        <button
+                                            className={`px-3 py-1 rounded transition duration-300 ease-in-out ${
+                                                account.Used
+                                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                            }`}
+                                            onClick={() => !account.Used && handleCopy(account.Email)}
+                                            disabled={account.Used}
+                                        >
+                                            복사
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -194,4 +188,4 @@ const GmailAccountPage: React.FC = () => { // 컴포넌트 이름 변경
     );
 };
 
-export default GmailAccountPage; // 변경된 컴포넌트 이름
+export default GmailAccountPage;
