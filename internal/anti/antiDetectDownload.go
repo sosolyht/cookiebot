@@ -30,26 +30,42 @@ func AntiDetectDownload(logger *zap.Logger) *ADD {
 }
 
 func (a *ADD) DownloadAndInstallAntiDetect() error {
-	url := "https://data.hidemyacc.com/HideMyAcc-3-Setup-072024.zip?_gl=1*1uh501u*_gcl_au*MTUxMDE0NjMxMi4xNzIyODI5NTg0*_ga*MTY2Mjg1MzA3LjE3MjI4Mjk1ODQ.*_ga_N9X6D2Y20T*MTcyMjg4OTk5OS4yLjEuMTcyMjg5MTY3MC40OC4wLjA."
-	filePath := filepath.Join(os.TempDir(), "HideMyAcc-3-Setup-072024.zip")
+	url := "https://cdn.undetectable.io/download/Undetectable_x64_win.exe"
+	tempDir := os.TempDir()
+	filePath := filepath.Join(tempDir, "Undetectable_x64_win.exe")
 
-	a.logger.Info("Starting A download", zap.String("url", url), zap.String("filePath", filePath))
+	a.logger.Info("Starting Undetectable download",
+		zap.String("url", url),
+		zap.String("tempDir", tempDir),
+		zap.String("filePath", filePath))
 
 	// 다운로드
 	err := a.downloadFile(filePath, url)
 	if err != nil {
-		a.logger.Error("Failed to download A", zap.Error(err))
+		a.logger.Error("Failed to download Undetectable", zap.Error(err))
 		return err
 	}
 
-	// 압축 해제 및 설치
-	err = a.extractAndInstallAntiDetect(filePath)
+	a.logger.Info("Undetectable download completed successfully", zap.String("filePath", filePath))
+
+	// 설치 실행
+	cmd := exec.Command(filePath)
+	err = cmd.Start()
 	if err != nil {
-		a.logger.Error("Failed to install A", zap.Error(err))
+		a.logger.Error("Failed to start Undetectable installer", zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("A download and installation completed successfully")
+	a.logger.Info("Undetectable installer started")
+
+	// 설치 경로 확인
+	installPath := `C:\Program Files\Undetectable\Undetectable.exe`
+	if exists, _ := pathExists(installPath); exists {
+		a.logger.Info("Undetectable is installed", zap.String("path", installPath))
+	} else {
+		a.logger.Info("Undetectable installation not detected. Please complete the installation process.")
+	}
+
 	return nil
 }
 
@@ -89,6 +105,17 @@ func (a *ADD) downloadFile(filePath string, url string) error {
 
 	a.logger.Info("Download completed", zap.String("filePath", filePath))
 	return nil
+}
+
+func pathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 func (a *ADD) extractAndInstallAntiDetect(zipPath string) error {
@@ -236,58 +263,37 @@ func (a *ADD) GetInstallationProgress() int {
 }
 
 func (a *ADD) IsAntiDetectInstalled() (bool, error) {
-	homeDir, err := os.UserHomeDir()
+	installPath := `C:\Program Files\Undetectable\Undetectable.exe`
+
+	exists, err := pathExists(installPath)
 	if err != nil {
-		a.logger.Fatal("Failed to get user home directory", zap.Error(err))
-	}
-	installPath := filepath.Join(homeDir, "AppData", "Local", "Programs", "hidemyacc-3", "HideMyAcc-3.exe")
-	if exists, err := pathExists(installPath); err != nil {
-		a.logger.Error("Failed to check A installation path", zap.Error(err))
+		a.logger.Error("Failed to check Undetectable installation path", zap.Error(err))
 		return false, err
-	} else if !exists {
-		a.logger.Info("A is not installed")
+	}
+
+	if !exists {
+		a.logger.Info("Undetectable is not installed")
 		return false, nil
 	}
 
-	a.logger.Info("A is installed", zap.String("path", installPath))
+	a.logger.Info("Undetectable is installed", zap.String("path", installPath))
 	return true, nil
 }
 
-func pathExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
 func (a *ADD) RunAntiDetect() error {
-	// 사용자의 홈 디렉토리 경로를 가져옵니다.
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		a.logger.Error("Failed to get user home directory", zap.Error(err))
-		return err
-	}
-
-	// HideMyAcc-3.exe 파일의 경로를 설정합니다.
-	exePath := filepath.Join(homeDir, "AppData", "Local", "Programs", "hidemyacc-3", "HideMyAcc-3.exe")
-
-	// 파일 존재 여부 확인
-	if _, err := os.Stat(exePath); os.IsNotExist(err) {
-		a.logger.Error("A executable not found", zap.String("path", exePath))
-		return fmt.Errorf("A executable not found: %s", exePath)
-	}
+	// 다운로드한 파일의 경로를 사용합니다.
+	exePath := filepath.Join(os.TempDir(), "Undetectable_x64_win.exe")
 
 	cmd := exec.Command(exePath)
-	if err := cmd.Start(); err != nil {
-		a.logger.Error("Failed to start A", zap.String("path", exePath), zap.Error(err))
+	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP}
+
+	err := cmd.Start()
+	if err != nil {
+		a.logger.Error("Failed to start Undetectable", zap.Error(err))
 		return err
 	}
 
-	a.logger.Info("A started successfully", zap.String("path", exePath))
+	a.logger.Info("Undetectable started successfully")
 	return nil
 }
 
@@ -298,7 +304,7 @@ func (a *ADD) EnsureAntiDetectRunning() error {
 	}
 
 	if isInstalled {
-		if !isProcessRunning("HideMyAcc-3.exe") {
+		if !isProcessRunning("Undetectable.exe") {
 			a.logger.Info("A is not running, attempting to start")
 			return a.RunAntiDetect()
 		}
@@ -320,28 +326,21 @@ func isProcessRunning(name string) bool {
 }
 
 func (a *ADD) CheckAndRunAntiDetect() error {
-	// 사용자의 홈 디렉토리 경로를 가져옵니다.
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		a.logger.Error("Failed to get user home directory", zap.Error(err))
-		return err
-	}
-
-	// HideMyAcc-3.exe 파일의 경로를 설정합니다.
-	exePath := filepath.Join(homeDir, "AppData", "Local", "Programs", "hidemyacc-3", "HideMyAcc-3.exe")
+	exePath := filepath.Join(os.TempDir(), "Undetectable_x64_win.exe")
 
 	// 파일이 존재하는지 확인합니다.
 	if _, err := os.Stat(exePath); os.IsNotExist(err) {
-		a.logger.Error("A executable not found", zap.String("path", exePath))
-		return fmt.Errorf("A executable not found: %s", exePath)
+		a.logger.Error("Undetectable executable not found", zap.String("path", exePath))
+		return fmt.Errorf("Undetectable executable not found: %s", exePath)
 	}
 
 	// 프로세스가 실행 중인지 확인합니다.
-	if !isProcessRunning("HideMyAcc-3.exe") {
-		a.logger.Info("A is not running, attempting to start", zap.String("path", exePath))
-		return a.RunAntiDetect()
+	if isProcessRunning("Undetectable.exe") {
+		a.logger.Info("Undetectable is already running")
+		return nil
 	}
 
-	a.logger.Info("A is already running")
-	return nil
+	// 프로세스가 실행 중이지 않으면 실행을 시도합니다.
+	a.logger.Info("Undetectable is not running, attempting to start", zap.String("path", exePath))
+	return a.RunAntiDetect()
 }
